@@ -32,4 +32,20 @@ def obtain_all_etf_df():
     # Add the column names
     df.columns = table_array[0]
 
+    # Keep only ETF type
+    df = df[df.Type == "ETF"]
+
+    # Remove leftover tab and newline characters to make tidier
+    df = df.apply(lambda x: x.str.replace('\n', ' ')).apply(lambda x: x.str.replace('\t', ' '))
+    # Keep only rows we care about
+    return df[["Exposure", "ASX Code", "Benchmark", "MER%", "Admission Date"]]
+
+# From dataframe of ETFs, keep only ones that are for:
+# - Australian shares
+# - Are "ethical"
+# This is done through keywords (hardcoded for now)
+def obtain_df_ethical_aussie_etf(df):
+    # Only care about ETF or active ETF
+    df = df[df.Exposure.str.contains("Ethical") | df.Exposure.str.contains("Sustain*") | df.Exposure.str.contains("Responsi*")]
+    df = df[df.Exposure.str.contains("Australia*") & ~df.Exposure.str.contains("ex")]
     return df
